@@ -44,10 +44,16 @@
 #define GPIO_BSRR_SET(n)           (1 << (n))
 #define GPIO_BSRR_RESET(n)         (1 << ((n) + 16))
 
-
+static const char fw_version[] = {'V', '1', '.', '0'};
+static uint32_t   led_status;
 
 int main(int argc, char *argv[])
 {
+    uint32_t i;
+    uint32_t reg;
+
+
+
 while(1){};
 /* Nao deveria chegar aqui 123  456
 */
