@@ -44,18 +44,61 @@
 #define GPIO_BSRR_SET(n)           (1 << (n))
 #define GPIO_BSRR_RESET(n)         (1 << ((n) + 16))
 
+#define LED_DELAY  50000
+
 static const char fw_version[] = {'V', '1', '.', '0'};
 static uint32_t   led_status;
+
 
 int main(int argc, char *argv[])
 {
     uint32_t i;
     uint32_t reg;
 
+  /* Ponteiros para registradores */
+
+  uint32_t *pRCC_AHB1ENR  = (uint32_t *)STM32_RCC_AHB1ENR;
+  uint32_t *pGPIOC_MODER  = (uint32_t *)STM32_GPIOC_MODER;
+  uint32_t *pGPIOC_OTYPER = (uint32_t *)STM32_GPIOC_OTYPER;
+  uint32_t *pGPIOC_PUPDR  = (uint32_t *)STM32_GPIOC_PUPDR;
+  uint32_t *pGPIOC_BSRR   = (uint32_t *)STM32_GPIOC_BSRR;
+
+    /* Habilita clock GPIOC */
+
+  reg  = *pRCC_AHB1ENR;
+  reg |= RCC_AHB1ENR_GPIOCEN;
+  *pRCC_AHB1ENR = reg;
+
+    /* Configura PC13 como saida pull-up off e pull-down off */
+
+  reg = *pGPIOC_MODER;
+  reg &= ~GPIO_MODER_MASK(13);
+  reg |= (GPIO_MODER_OUTPUT << GPIO_MODER_SHIFT(13));
+  *pGPIOC_MODER = reg;  
+
+  reg = *pGPIOC_OTYPER;
+  reg &= ~GPIO_OT_MASK(13);
+  reg |= (GPIO_OTYPER_PP << GPIO_OT_SHIFT(13));
+  *pGPIOC_OTYPER = reg;
+
+  reg = *pGPIOC_PUPDR;
+  reg &= ~GPIO_PUPDR_MASK(13);
+  reg |= (GPIO_PUPDR_NONE << GPIO_PUPDR_SHIFT(13));
+  *pGPIOC_PUPDR = reg;
 
 
-while(1){};
-/* Nao deveria chegar aqui 123  456
-*/
+
+while(1){
+          /* Liga LED */
+
+      *pGPIOC_BSRR = GPIO_BSRR_RESET(13);
+      for (i = 0; i < LED_DELAY; i++);
+
+      /* Desliga LED */
+
+      *pGPIOC_BSRR = GPIO_BSRR_SET(13);
+      for (i = 0; i < LED_DELAY; i++);
+};
+/* Nao deveria chegar aqui */
 return EXIT_SUCCESS;
 }
