@@ -17,4 +17,4 @@ $(PROG).elf: $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@ 
 clean: 
-	rm -f $(OBJS) $(PROG).elf
+	rm -f $(OBJS) $(PROG).bin $(PROG).elf
